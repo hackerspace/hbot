@@ -40,7 +40,7 @@ class IRC
 
   def srv_events(ev)
     case ev.strip
-      when /^PING:(.+)$/i
+      when /^PING :(.+)$/i
         send "PONG :#{$1}"
       when /^:(.+?)!(.+?)@(.+?)\sPRIVMSG\s.+\s:[\001]PING (.+)[\001]$/i
         puts "[ CTCP PING from #{$1}!#{$2}@#{$3} ]"
