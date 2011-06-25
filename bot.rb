@@ -160,6 +160,27 @@ irc.command "mostrecent" do |chan, from|
   irc.say "WEB NEWS: #{date}\n#{site}#{href}\nBy: #{user}\nSummary: #{sum}", :to => to
 end
 
+irc.command "everything" do |chan, from|
+  to = chan
+  to = from if chan == USER
+
+  site = 'http://undergroundlab.cz'
+
+  html = Nokogiri::HTML(open('http://undergroundlab.cz/hackerspace/wiki/HACKERSPACE?do=recent'))
+  list = html.css('form#dw__recent > div > ul > li > div')
+
+  list.each do |item|
+   date = item.css('span.date').text.strip
+   href = item.css('a.wikilink1').attr('href')
+   sum  = item.css('span.sum').text
+   user = item.css('span.user').text.strip
+  
+   irc.say "WEB NEWS: #{date}\n#{site}#{href}\nBy: #{user}\nSummary: #{sum}", :to => to
+  end
+end
+
+
+
 irc.command "ping" do |chan, from|
   to = chan
   to = from if chan == USER
