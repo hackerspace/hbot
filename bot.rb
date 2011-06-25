@@ -136,6 +136,7 @@ irc.on_timeout do
     user = item.css('span.user').text.strip
     if !r.include?(date.strip)
       irc.say "WEB NEWS: #{date} \nAt #{site}#{href}\nBy:#{user}\nSummary:#{sum}"
+      recent.puts date
     end
   end
   recent.close
