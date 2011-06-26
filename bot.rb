@@ -118,8 +118,9 @@ class IRC
   end
 end
 
-def scan(type = :changes, irc, say_to)
+def scan(type, irc, say_to)
   #type:
+  #  :changes
   #  :most_recent
   #  :all
 
