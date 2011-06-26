@@ -5,12 +5,14 @@ require 'nokogiri'
 require 'socket'
 require 'openssl'
 
-HOST = ''
-PORT = 6667
-USER = 'hbot'
-CHAN = '#chan'
+cfg = YAML::load_file('config.yml')
 
-TIMEOUT = 10 #in seconds
+HOST = cfg['irc']['host']
+PORT = cfg['irc']['port']
+USER = cfg['irc']['user']
+CHAN = cfg['irc']['chan']
+
+TIMEOUT = cfg['timeout']
 
 class IRC
   def initialize(host, port, user, chan)
@@ -120,9 +122,10 @@ irc = IRC.new(HOST, PORT, USER, CHAN)
 irc.connect()
 
 irc.on_timeout do
-  site = ''
+  site = cfg['web']['site']
+  dw_recent = File.join(site, cfg['web']['dw_recent'])
 
-  html = Nokogiri::HTML(open(''))
+  html = Nokogiri::HTML(open(dw_recent))
   list = html.css('form#dw__recent > div > ul > li > div')
   
   recent = open('recent', 'r')
@@ -146,9 +149,10 @@ irc.command "mostrecent" do |chan, from|
   to = chan
   to = from if chan == USER
 
-  site = ''
+  site = cfg['web']['site']
+  dw_recent = File.join(site, cfg['web']['dw_recent'])
 
-  html = Nokogiri::HTML(open(''))
+  html = Nokogiri::HTML(open(dw_recent))
   list = html.css('form#dw__recent > div > ul > li > div')
 
   item = list[0]
@@ -163,10 +167,11 @@ end
 irc.command "everything" do |chan, from|
   to = chan
   to = from if chan == USER
+site = cfg['web']['site']
+  dw_recent = File.join(site, cfg['web']['dw_recent'])
 
-  site = 'http://undergroundlab.cz'
+  html = Nokogiri::HTML(open(dw_recent))
 
-  html = Nokogiri::HTML(open('http://undergroundlab.cz/hackerspace/wiki/HACKERSPACE?do=recent'))
   list = html.css('form#dw__recent > div > ul > li > div')
 
   list.each do |item|

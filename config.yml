@@ -1,0 +1,11 @@
+irc: 
+  host: irc.host
+  port: 6667
+  user: hbot
+  chan: '#chan'
+
+timeout: 10
+
+web:
+  site: 'http://web.to.scan'
+  dw_recent: '/path/to/doku/wiki/SMTG?do=recent'
