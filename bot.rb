@@ -146,7 +146,7 @@ def scan(type, irc, say_to)
 
   list.each do |item| 
     date = item.css('span.date').text.strip
-    href = item.css('a.wikilink1').attr('href').strip
+    href = item.css('a.wikilink1').attr('href')
     sum  = item.css('span.sum').text.strip
     user = item.css('span.user').text.strip
     formatted = "WEB NEWS: #{date} | #{user} | #{sum}\nurl:#{site}#{href}"
