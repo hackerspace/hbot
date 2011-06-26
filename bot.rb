@@ -6,14 +6,14 @@ require 'socket'
 require 'openssl'
 require 'yaml'
 
-cfg = YAML::load_file('config.yml')
+$cfg = YAML::load_file('config.yml')
 
-HOST = cfg['irc']['host']
-PORT = cfg['irc']['port']
-USER = cfg['irc']['user']
-CHAN = cfg['irc']['chan']
+HOST = $cfg['irc']['host']
+PORT = $cfg['irc']['port']
+USER = $cfg['irc']['user']
+CHAN = $cfg['irc']['chan']
 
-TIMEOUT = cfg['timeout']
+TIMEOUT = $cfg['timeout']
 
 class IRC
   def initialize(host, port, user, chan)
@@ -125,8 +125,8 @@ def scan(type, irc, say_to)
   #  :most_recent
   #  :all
 
-  site = cfg['web']['site']
-  dw_recent = File.join(site, cfg['web']['dw_recent'])
+  site = $cfg['web']['site']
+  dw_recent = File.join(site, $cfg['web']['dw_recent'])
 
   html = Nokogiri::HTML(open(dw_recent))
   list = html.css('form#dw__recent > div > ul > li > div')
