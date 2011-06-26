@@ -149,7 +149,7 @@ def scan(type, irc, say_to)
     href = item.css('a.wikilink1').attr('href')
     sum  = item.css('span.sum').text.strip
     user = item.css('span.user').text.strip
-    formatted = "WEB NEWS: #{date} | #{user} | #{sum}\nurl:#{site}#{href}"
+    formatted = "WEB NEWS: #{date} | #{user} | #{sum}\nurl: #{site}#{href}"
 
     if (type == :changes) && (!r.include?(date.strip))
       irc.say formatted, :to => say_to
@@ -159,7 +159,7 @@ def scan(type, irc, say_to)
     end
   end
   
-  recent.close if type == changes
+  recent.close if type == :changes
 end
 
 irc = IRC.new(HOST, PORT, USER, CHAN)
