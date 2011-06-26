@@ -118,73 +118,68 @@ class IRC
   end
 end
 
-irc = IRC.new(HOST, PORT, USER, CHAN)
-irc.connect()
+def scan(type = :changes, irc, say_to)
+  #type:
+  #  :most_recent
+  #  :all
 
-irc.on_timeout do
   site = cfg['web']['site']
   dw_recent = File.join(site, cfg['web']['dw_recent'])
 
   html = Nokogiri::HTML(open(dw_recent))
   list = html.css('form#dw__recent > div > ul > li > div')
   
-  recent = open('recent', 'r')
-  r = recent.read.split "\n"
+  case type 
+    when :changes
+      recent = open('recent', 'r')
+      r = recent.read.split "\n"
+  
+      recent = open('recent', 'a')  
+    when :most_recent
+      l = list[0]
+      list = []
+      list << l
+  end
 
-  recent = open('recent', 'a')
-  to_say = list.each do |item| 
+
+  list.each do |item| 
     date = item.css('span.date').text.strip
     href = item.css('a.wikilink1').attr('href')
     sum  = item.css('span.sum').text
     user = item.css('span.user').text.strip
-    if !r.include?(date.strip)
-      irc.say "WEB NEWS: #{date} \nAt #{site}#{href}\nBy:#{user}\nSummary:#{sum}"
+    formatted = "WEB NEWS: #{date} \nAt #{site}#{href}\nBy:#{user}\nSummary:#{sum}"
+
+    if type == :changes && !r.include?(date.strip)
+      irc.say formatted, :to => say_to
       recent.puts date
+    else # type == :most_recent, :all
+      irc.say formatted, :to => say_to
     end
   end
-  recent.close
+  
+  recent.close if type == changes
+end
+
+irc = IRC.new(HOST, PORT, USER, CHAN)
+irc.connect()
+
+irc.on_timeout do
+  scan(:changes, irc)
 end
 
 irc.command "mostrecent" do |chan, from|
   to = chan
   to = from if chan == USER
 
-  site = cfg['web']['site']
-  dw_recent = File.join(site, cfg['web']['dw_recent'])
-
-  html = Nokogiri::HTML(open(dw_recent))
-  list = html.css('form#dw__recent > div > ul > li > div')
-
-  item = list[0]
-  date = item.css('span.date').text.strip
-  href = item.css('a.wikilink1').attr('href')
-  sum  = item.css('span.sum').text
-  user = item.css('span.user').text.strip
-
-  irc.say "WEB NEWS: #{date}\n#{site}#{href}\nBy: #{user}\nSummary: #{sum}", :to => to
+  scan(:most_recent, irc, to)
 end
 
 irc.command "everything" do |chan, from|
   to = chan
   to = from if chan == USER
-site = cfg['web']['site']
-  dw_recent = File.join(site, cfg['web']['dw_recent'])
 
-  html = Nokogiri::HTML(open(dw_recent))
-
-  list = html.css('form#dw__recent > div > ul > li > div')
-
-  list.each do |item|
-   date = item.css('span.date').text.strip
-   href = item.css('a.wikilink1').attr('href')
-   sum  = item.css('span.sum').text
-   user = item.css('span.user').text.strip
-  
-   irc.say "WEB NEWS: #{date}\n#{site}#{href}\nBy: #{user}\nSummary: #{sum}", :to => to
-  end
+  scan(:all, irc, to)
 end
-
-
 
 irc.command "ping" do |chan, from|
   to = chan
