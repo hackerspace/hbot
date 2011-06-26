@@ -4,6 +4,7 @@ require 'nokogiri'
 
 require 'socket'
 require 'openssl'
+require 'yaml'
 
 cfg = YAML::load_file('config.yml')
 
