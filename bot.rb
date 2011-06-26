@@ -166,7 +166,7 @@ irc = IRC.new(HOST, PORT, USER, CHAN)
 irc.connect()
 
 irc.on_timeout do
-  scan(:changes, irc)
+  scan(:changes, irc, CHAN)
 end
 
 irc.command "mostrecent" do |chan, from|
