@@ -145,10 +145,27 @@ def scan(type, irc, say_to)
 
 
   list.each do |item| 
-    date = item.css('span.date').text.strip
-    href = item.css('a.wikilink1').attr('href')
-    sum  = item.css('span.sum').text.strip
-    user = item.css('span.user').text.strip
+    begin
+      date = item.css('span.date').text.strip
+    rescue
+      date = nil
+    end
+    begin
+      href = item.css('a.wikilink1').attr('href').value.strip
+    rescue
+      href = nil
+    end
+    puts href.inspect
+    begin
+      sum = item.css('span.sum').text.strip
+    rescue
+      sum = nil
+    end
+    begin
+      user = item.css('span.user').text.strip
+    rescue
+      user = nil
+    end
     formatted = "WEB NEWS: #{date} | #{user} | #{sum}\nurl: #{site}#{href}"
 
     if (type == :changes) && (!r.include?(date.strip))
