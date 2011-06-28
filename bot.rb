@@ -155,7 +155,6 @@ def scan(type, irc, say_to)
     rescue
       href = nil
     end
-    puts href.inspect
     begin
       sum = item.css('span.sum').text.strip
     rescue
