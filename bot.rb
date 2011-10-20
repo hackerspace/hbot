@@ -21,7 +21,7 @@ class IRC
     ssl_context = OpenSSL::SSL::SSLContext.new()
     #ssl_context.cert = OpenSSL::X509::Certificate.new(File.open("certs/MyCompanyClient.crt"))
     #ssl_context.key = OpenSSL::PKey::RSA.new(File.open("keys/MyCompanyClient.key"))
-    
+
     @ssl_socket = OpenSSL::SSL::SSLSocket.new(socket, ssl_context)
     @ssl_socket.sync_close = true
     @ssl_socket.connect
@@ -30,7 +30,7 @@ class IRC
     @tasks = []
     @commands = {}
   end
-  
+
   def send(str)
     @ssl_socket.puts str
   end
@@ -130,13 +130,13 @@ def scan(type, irc, say_to)
 
   html = Nokogiri::HTML(open(dw_recent))
   list = html.css('form#dw__recent > div > ul > li > div')
-  
-  case type 
+
+  case type
     when :changes
       recent = open('recent', 'r')
       r = recent.read.split "\n"
-  
-      recent = open('recent', 'a')  
+
+      recent = open('recent', 'a')
     when :most_recent
       l = list[0]
       list = []
@@ -144,7 +144,7 @@ def scan(type, irc, say_to)
   end
 
 
-  list.each do |item| 
+  list.each do |item|
     begin
       date = item.css('span.date').text.strip
     rescue
@@ -174,7 +174,7 @@ def scan(type, irc, say_to)
       irc.say formatted, :to => say_to
     end
   end
-  
+
   recent.close if type == :changes
 end
 
