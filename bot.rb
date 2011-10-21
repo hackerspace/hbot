@@ -97,7 +97,7 @@ class IRC
 
   def run
     while true
-        ready = select([@ssl_socket, $stdin], nil, nil, TIMEOUT)
+        ready = select([@ssl_socket, $stdin], nil, nil, 10)
         if !ready
           @tasks.each do |task|
             task.call
@@ -122,9 +122,14 @@ end
 
 irc = IRC.new(HOST, PORT, USER, CHAN)
 irc.connect()
+counter = 0
 
 irc.on_timeout do
-  irc.say MSG, :to => CHAN
+  counter += 10
+  if counter > TIMEOUT then
+    irc.say MSG, :to => CHAN
+  counter = 0
+  end
 end
 
 irc.command "ping" do |chan, from|
