@@ -5,7 +5,4 @@ irc:
   chan: '#chan'
 
 timeout: 10
-
-web:
-  site: 'http://web.to.scan'
-  dw_recent: '/path/to/doku/wiki/SMTG?do=recent'
+msg: 'Message to announce'
