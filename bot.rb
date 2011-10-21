@@ -125,11 +125,9 @@ irc.connect()
 counter = 0
 
 irc.on_timeout do
+  irc.say MSG, :to => CHAN if counter == 0
   counter += 10
-  if counter > TIMEOUT then
-    irc.say MSG, :to => CHAN
-  counter = 0
-  end
+  counter = 0 if counter > TIMEOUT
 end
 
 irc.command "ping" do |chan, from|
