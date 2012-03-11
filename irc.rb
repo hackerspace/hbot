@@ -119,16 +119,17 @@ class DSL
     end
   end
 
-  def hear(re, &block)
+  def initialize()
     @actions ||= []
+  end
+
+  def hear(re, &block)
     @actions << [DSL::_hear(re), block]
 
     puts "#{re} is an empty action" if not block
     puts "#{re} has associated action"
 
     p @actions
-
-#    raise "Not implemented"
   end
 
   def bot_connected
@@ -146,30 +147,29 @@ class DSL
 
     def server(s)
       @cfg.server = s
-      self
     end
 
     def port(p)
       @cfg.port = p
-      self
     end
 
     def name(n)
       @cfg.name = n
-      self
     end
 
-    def channels(sc, opts = {})
-      opts[:scope] ||= nil
-      @cfg.scope = sc
-      self
+    def channels(ch, opts = {})
+      opts[:scope]  ||= nil
+      @cfg.scope    ||= {}
+      @cfg.scope[opts[:scope]] ||= []
+      @cfg.scope[opts[:scope]]  += ch
     end
   end
 
   def irc(&block)
     @configs ||= []
     i = Irc.new
-    @configs << i.instance_eval(&block)
+    i.instance_eval(&block)
+    @configs << i
     p @configs
   end
 
@@ -192,4 +192,6 @@ def irc(&block)
   puts "i can has block" if block
   dsl = DSL.new
   dsl.instance_eval &block
+  p dsl.instance_variable_get :@scopes
+  p dsl.instance_variable_get :@configs
 end

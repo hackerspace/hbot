@@ -30,6 +30,7 @@ irc do
 
   bot_connected do
     say "buzny"
+    set_topic "gejstvo | #{get_topic}"
   end
 
   user_connected do
