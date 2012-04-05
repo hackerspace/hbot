@@ -17,14 +17,14 @@ TIMEOUT = $cfg['timeout']
 
 class IRC
   def initialize(host, port, user, chan)
-    socket = TCPSocket.new(HOST, PORT)
-    ssl_context = OpenSSL::SSL::SSLContext.new()
-    #ssl_context.cert = OpenSSL::X509::Certificate.new(File.open("certs/MyCompanyClient.crt"))
-    #ssl_context.key = OpenSSL::PKey::RSA.new(File.open("keys/MyCompanyClient.key"))
+    @ssl_socket = TCPSocket.new(HOST, PORT)
+    #ssl_context = OpenSSL::SSL::SSLContext.new()
+    ##ssl_context.cert = OpenSSL::X509::Certificate.new(File.open("certs/MyCompanyClient.crt"))
+    ##ssl_context.key = OpenSSL::PKey::RSA.new(File.open("keys/MyCompanyClient.key"))
 
-    @ssl_socket = OpenSSL::SSL::SSLSocket.new(socket, ssl_context)
-    @ssl_socket.sync_close = true
-    @ssl_socket.connect
+    #@ssl_socket = OpenSSL::SSL::SSLSocket.new(socket, ssl_context)
+    #@ssl_socket.sync_close = true
+    #@ssl_socket.connect
     @user = user
     @chan = chan
     @tasks = []
@@ -129,7 +129,7 @@ def scan(type, irc, say_to)
   dw_recent = File.join(site, $cfg['web']['dw_recent'])
 
   html = Nokogiri::HTML(open(dw_recent))
-  list = html.css('form#dw__recent > div > ul > li > div')
+  list = html.css('div#content > div#bodyContent > h4')
 
   case type
     when :changes
@@ -143,37 +143,27 @@ def scan(type, irc, say_to)
       list << l
   end
 
+  # wikimedia scraper
+  list.each do |item_date|
+    item_date.next.next.css('li').each do |item_update|
+      user = item_update.css('.mw-userlink').text
+      sum  = item_update.css('.comment').text
+      href = item_update.css('a')[2].attributes['href'].value
+      date = item_date.text << ' ' << item_update.css('a')[2].next.text.gsub(/.*(\d\d:\d\d).*/,'\1')
 
-  list.each do |item|
-    begin
-      date = item.css('span.date').text.strip
-    rescue
-      date = nil
-    end
-    begin
-      href = item.css('a.wikilink1').attr('href').value.strip
-    rescue
-      href = nil
-    end
-    begin
-      sum = item.css('span.sum').text.strip
-    rescue
-      sum = nil
-    end
-    begin
-      user = item.css('span.user').text.strip
-    rescue
-      user = nil
-    end
-    formatted = "WEB NEWS: #{date} | #{user} | #{sum}\nurl: #{site}#{href}"
+      formatted = "HYPNOTOAD PRESENTS: #{date} | #{user} | #{sum}\nurl: #{site}#{href}"
 
-    if (type == :changes) && (!r.include?(date.strip))
-      irc.say formatted, :to => say_to
-      recent.puts date
-    elsif [:most_recent, :all].include?(type)
-      irc.say formatted, :to => say_to
+      if (type == :changes) && (!r.include?(date.strip))
+        irc.say formatted, :to => say_to
+        recent.puts date
+        sleep 1
+      elsif [:most_recent, :all].include?(type)
+        irc.say formatted, :to => say_to
+        sleep 1
+      end
+
     end
-  end
+ end
 
   recent.close if type == :changes
 end
